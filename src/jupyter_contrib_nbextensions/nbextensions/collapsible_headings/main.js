@@ -583,39 +583,14 @@
 	 *  Return a promise which resolves when the Tooltip class methods have
 	 *  been appropriately patched.
 	 *
-	 *  For notebook 4.x, cells had css position:static, and changing them to
-	 *  relative to get heading brackets working broke the tooltip position
-	 *  calculation. In order to fix this, we patch the 4.x Tooltip._show
-	 *  method to temporarily reapply position:static while the tooltip
-	 *  position is calculated & the animation queued, before revertign to the
-	 *  css-appled position:relative.
-	 *	For notebook 5.x, cells are already position:relative, so the patch is
+	 *  Remove compatible for notebook 4.x.
+	 *	For notebook 5.x and 6.X, cells are already position:relative, so the patch is
 	 *  unecessary.
 	 *
 	 *  @return {Promise}
 	 */
 	function patch_Tooltip () {
-		if (Number(Jupyter.version[0]) >= 5) {
-			return Promise.resolve();
-		}
-		return new Promise(function (resolve, reject) {
-			requirejs(['notebook/js/tooltip'], function on_success (tooltip) {
-				console.debug(log_prefix, 'patching Tooltip.prototype');
-
-				var orig_tooltip__show = tooltip.Tooltip.prototype._show;
-				tooltip.Tooltip.prototype._show = function (reply) {
-					var $cell = $(this.code_mirror.getWrapperElement()).closest('.cell');
-					$cell.css('position', 'static');
-					var ret = orig_tooltip__show.apply(this, arguments);
-					$cell.css('position', '');
-					return ret;
-				};
-
-				resolve();
-			}, reject);
-		}).catch(function on_reject (reason) {
-			console.warn(log_prefix, 'error patching Tooltip.prototype:', reason);
-		});
+		return Promise.resolve();
 	}
 
 	/**
